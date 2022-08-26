@@ -11,8 +11,11 @@ import 'sentence_list_widget.dart';
 
 class CustomSearchPage extends SearchDelegate {
   final void Function(SentenceModel) updateSentence;
+  late Stream<QuerySnapshot<Map<String, dynamic>>> snapShotCollection;
 
-  CustomSearchPage({required this.updateSentence});
+  CustomSearchPage({required this.updateSentence}) {
+    snapShotCollection = fireStore.collection('Sentence').snapshots();
+  }
 
   @override
   List<Widget>? buildActions(BuildContext context) {
@@ -56,7 +59,7 @@ class CustomSearchPage extends SearchDelegate {
           List<SentenceModel> filteredList = sentenceList.where((model) {
             return model.coTitle.toLowerCase().contains(query.toLowerCase());
           }).toList();
-          return SentenceListWidget(sentenceList: filteredList, updateSentence: updateSentence);
+          return SentenceListWidget(updateSentence: updateSentence);
         }
       },
     );

@@ -11,7 +11,6 @@ import 'utilities/constants/route_generator.dart';
 
 late FirebaseAuth user;
 late FirebaseFirestore fireStore;
-late Stream<QuerySnapshot<Map<String, dynamic>>> snapShotCollection;
 
 void main() async {
   await init;
@@ -35,7 +34,6 @@ Future<void> get initFirebase async {
   );
   user = FirebaseAuth.instance;
   fireStore = FirebaseFirestore.instance;
-  snapShotCollection = fireStore.collection('Sentence').snapshots();
 }
 
 class MainApp extends StatelessWidget {

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,6 +20,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   @override
   void initState() {
     super.initState();
@@ -33,6 +33,7 @@ class _HomePageState extends State<HomePage> {
         debugPrint('User is signed in!');
       }
     });
+
   }
 
   @override
@@ -64,24 +65,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      // body: SentenceListWidget(snapShotCollection: snapShotCollection, updateSentence: getModalBottomSheet),
-      body: StreamBuilder(
-        stream: snapShotCollection,
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(
-              child: Text('Veriler getiriliyor ...'),
-            );
-          } else {
-            List<SentenceModel> sentenceList = [];
-            for (QueryDocumentSnapshot<Map<String, dynamic>> element in snapshot.data!.docs) {
-              SentenceModel sentenceModel = SentenceModel.fromJson(element.data());
-              sentenceList.add(sentenceModel);
-            }
-            return SentenceListWidget(sentenceList: sentenceList, updateSentence: getModalBottomSheet);
-          }
-        },
-      ),
+      body: SentenceListWidget(updateSentence: getModalBottomSheet),
       floatingActionButton: FloatingActionButton(
         onPressed: () => getModalBottomSheet(null),
         child: const Icon(Icons.add_box),

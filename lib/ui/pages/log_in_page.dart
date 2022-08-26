@@ -54,12 +54,13 @@ class _LogInPageState extends State<LogInPage> {
       body: Center(
         child: Container(
           width: 0.3.sw,
-          height: 0.3.sh,
+          height: 0.4.sh,
           color: Colors.blue.shade400.withOpacity(0.5),
           padding: EdgeInsets.all(60.0.sp),
           child: Form(
             key: formKey,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8.0),
