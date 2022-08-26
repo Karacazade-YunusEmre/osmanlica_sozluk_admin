@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "746091179193",
+    "project_id": "lugat-b17bf",
+    "storage_bucket": "lugat-b17bf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746091179193:android:d386523a0e9f473b09ff68",
+        "android_client_info": {
+          "package_name": "com.example.lugat_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "746091179193-rtdivieqsnm10h52em68l5g97dumjveb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfpxezisVdDOBHpEC2-b7BXfzhiiNfcsM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "746091179193-rtdivieqsnm10h52em68l5g97dumjveb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
