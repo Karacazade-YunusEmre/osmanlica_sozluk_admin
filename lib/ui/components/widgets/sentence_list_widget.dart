@@ -3,35 +3,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lugat_admin/ui/components/widgets/custom_expansion_tile.dart';
 
-import '../../../main.dart';
 import '../../../models/concrete/sentence_model.dart';
 
 /// Created by Yunus Emre Yıldırım
 /// on 25.08.2022
 
 class SentenceListWidget extends StatefulWidget {
+  final Stream<QuerySnapshot<Map<String, dynamic>>> snapshotCollection;
   final void Function(SentenceModel) updateSentence;
 
-  const SentenceListWidget({Key? key, required this.updateSentence}) : super(key: key);
+  const SentenceListWidget({Key? key, required this.snapshotCollection, required this.updateSentence}) : super(key: key);
 
   @override
   State<SentenceListWidget> createState() => _SentenceListWidgetState();
 }
 
 class _SentenceListWidgetState extends State<SentenceListWidget> {
-  late Stream<QuerySnapshot<Map<String, dynamic>>> snapShotCollection;
-
   @override
   void initState() {
     super.initState();
-
-    snapShotCollection = fireStore.collection('Sentence').snapshots();
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: snapShotCollection,
+      stream: widget.snapshotCollection,
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
         if (!snapshot.hasData) {
           return const Center(

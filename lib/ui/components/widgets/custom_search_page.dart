@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:lugat_admin/ui/components/widgets/sentence_list_widget.dart';
 
 import '../../../main.dart';
 import '../../../models/concrete/sentence_model.dart';
-import 'sentence_list_widget.dart';
 
 /// Created by Yunus Emre Yıldırım
 /// on 25.08.2022
@@ -13,9 +13,7 @@ class CustomSearchPage extends SearchDelegate {
   final void Function(SentenceModel) updateSentence;
   late Stream<QuerySnapshot<Map<String, dynamic>>> snapShotCollection;
 
-  CustomSearchPage({required this.updateSentence}) {
-    snapShotCollection = fireStore.collection('Sentence').snapshots();
-  }
+  CustomSearchPage({required this.updateSentence});
 
   @override
   List<Widget>? buildActions(BuildContext context) {
@@ -43,26 +41,8 @@ class CustomSearchPage extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    return StreamBuilder(
-      stream: snapShotCollection,
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(
-            child: Text('Veriler getiriliyor ...'),
-          );
-        } else {
-          List<SentenceModel> sentenceList = [];
-          for (QueryDocumentSnapshot<Map<String, dynamic>> element in snapshot.data!.docs) {
-            SentenceModel sentenceModel = SentenceModel.fromJson(element.data());
-            sentenceList.add(sentenceModel);
-          }
-          List<SentenceModel> filteredList = sentenceList.where((model) {
-            return model.coTitle.toLowerCase().contains(query.toLowerCase());
-          }).toList();
-          return SentenceListWidget(updateSentence: updateSentence);
-        }
-      },
-    );
+    snapShotCollection = fireStore.collection('Sentence').where('coTitle', isGreaterThanOrEqualTo: query.toLowerCase()).where('coTitle', isLessThanOrEqualTo: query.toLowerCase()).snapshots();
+    return SentenceListWidget(snapshotCollection: snapShotCollection, updateSentence: updateSentence);
   }
 
   @override

@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
+import '../../utilities/sentence_list.dart';
 import '/models/concrete/sentence_model.dart';
 import '../../main.dart';
 import '../../models/concrete/sentence_model.dart';
@@ -20,6 +22,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late Stream<QuerySnapshot<Map<String, dynamic>>> snapShotCollection;
 
   @override
   void initState() {
@@ -34,6 +37,7 @@ class _HomePageState extends State<HomePage> {
       }
     });
 
+    snapShotCollection = fireStore.collection('Sentence').snapshots();
   }
 
   @override
@@ -44,14 +48,33 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Lugat Yönetici Paneli'),
         centerTitle: true,
         actions: [
+          // Padding(
+          //   padding: EdgeInsets.all(16.0.sp),
+          //   child: IconButton(
+          //     onPressed: () async {
+          //       for (Map<String, dynamic> item in sentenceList) {
+          //         String coTitle = getCoTitle(item['title']);
+          //         String id = fireStore.collection('Sentence').doc().id;
+          //         SentenceModel sentenceModel = SentenceModel(id: id, title: item['title'], content: item['content'], isRating: 0, coTitle: coTitle);
+          //
+          //         fireStore.doc('Sentence/$id').set(sentenceModel.toJson());
+          //       }
+          //     },
+          //     icon: Icon(
+          //       Icons.add,
+          //       size: 130.sp,
+          //     ),
+          //   ),
+          // ),
           Padding(
             padding: EdgeInsets.all(16.0.sp),
             child: IconButton(
-                onPressed: showSearchPage,
-                icon: Icon(
-                  Icons.search,
-                  size: 130.sp,
-                )),
+              onPressed: showSearchPage,
+              icon: Icon(
+                Icons.search,
+                size: 130.sp,
+              ),
+            ),
           ),
           Padding(
             padding: EdgeInsets.all(16.0.sp),
@@ -65,7 +88,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: SentenceListWidget(updateSentence: getModalBottomSheet),
+      body: SentenceListWidget(snapshotCollection: snapShotCollection, updateSentence: getModalBottomSheet),
       floatingActionButton: FloatingActionButton(
         onPressed: () => getModalBottomSheet(null),
         child: const Icon(Icons.add_box),
@@ -148,11 +171,11 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
                           formKey.currentState!.save();
+                          String coTitle = getCoTitle(title);
 
                           if (selectedSentence == null) {
                             String id = fireStore.collection('Sentence').doc().id;
 
-                            String coTitle = getCoTitle(title);
                             SentenceModel sentenceModel = SentenceModel(id: id, title: title, content: content, isRating: 0, coTitle: coTitle);
 
                             fireStore.doc('Sentence/$id').set(sentenceModel.toJson());
@@ -162,7 +185,6 @@ class _HomePageState extends State<HomePage> {
                             Navigator.pop(context);
                             Get.snackbar('', 'Kayıt işlemi başarılı');
                           } else {
-                            String coTitle = getCoTitle(title);
                             selectedSentence.title = title;
                             selectedSentence.content = content;
                             selectedSentence.coTitle = coTitle;
@@ -184,13 +206,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   String getCoTitle(String title) {
-    String temp = '';
+    String temp = title;
 
-    temp = title.split(' ').join();
-    temp = temp.split('-').join();
-    temp = temp.split("'").join();
+    List<String> patternList = [' ', '-', "'", '(', ')', '.', ':', ',', ';', '{', '}', '[', ']', '!', '?'];
 
-    return temp;
+    for (String item in patternList) {
+      temp = temp.split(item).join();
+    }
+
+    return temp.toLowerCase();
   }
 
   void showSearchPage() {
