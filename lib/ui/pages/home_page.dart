@@ -1,15 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-import '../../utilities/sentence_list.dart';
 import '/models/concrete/sentence_model.dart';
+import '../../controllers/main_controller.dart';
 import '../../main.dart';
-import '../../models/concrete/sentence_model.dart';
-import '../components/widgets/custom_search_page.dart';
-import '../components/widgets/sentence_list_widget.dart';
+import '../components/widgets/search_bar_widget.dart';
 
 /// Created by Yunus Emre Yıldırım
 /// on 24.08.2022
@@ -22,7 +18,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Stream<QuerySnapshot<Map<String, dynamic>>> snapShotCollection;
+  late final MainController mainController;
+  late final TextEditingController searchBarController;
 
   @override
   void initState() {
@@ -37,7 +34,14 @@ class _HomePageState extends State<HomePage> {
       }
     });
 
-    snapShotCollection = fireStore.collection('Sentence').snapshots();
+    mainController = Get.find();
+    searchBarController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    mainController.dispose();
+    super.dispose();
   }
 
   @override
@@ -45,42 +49,22 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        elevation: 5,
         title: const Text('Lugat Yönetici Paneli'),
         centerTitle: true,
         actions: [
-          // Padding(
-          //   padding: EdgeInsets.all(16.0.sp),
-          //   child: IconButton(
-          //     onPressed: () async {
-          //       for (Map<String, dynamic> item in sentenceList) {
-          //         String coTitle = getCoTitle(item['title']);
-          //         String id = fireStore.collection('Sentence').doc().id;
-          //         SentenceModel sentenceModel = SentenceModel(id: id, title: item['title'], content: item['content'], isRating: 0, coTitle: coTitle);
-          //
-          //         fireStore.doc('Sentence/$id').set(sentenceModel.toJson());
-          //       }
-          //     },
-          //     icon: Icon(
-          //       Icons.add,
-          //       size: 130.sp,
-          //     ),
-          //   ),
-          // ),
           Padding(
-            padding: EdgeInsets.all(16.0.sp),
-            child: IconButton(
-              onPressed: showSearchPage,
-              icon: Icon(
-                Icons.search,
-                size: 130.sp,
-              ),
+            padding: const EdgeInsets.all(8.0),
+            child: SearchBarWidget(
+              textController: searchBarController,
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(16.0.sp),
+            padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                primary: Colors.redAccent.shade400.withOpacity(0.7),
+                backgroundColor: Colors.redAccent.shade400.withOpacity(0.7),
+                shape: const StadiumBorder(),
               ),
               onPressed: () => user.signOut(),
               child: const Text('Çıkış Yap'),
@@ -88,7 +72,8 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: SentenceListWidget(snapshotCollection: snapShotCollection, updateSentence: getModalBottomSheet),
+      // body: SentenceListWidget(sentenceList: mainController.sentenceList, updateSentence: getModalBottomSheet),
+      body: Container(),
       floatingActionButton: FloatingActionButton(
         onPressed: () => getModalBottomSheet(null),
         child: const Icon(Icons.add_box),
@@ -108,15 +93,15 @@ class _HomePageState extends State<HomePage> {
         context: context,
         builder: (BuildContext context) {
           return Container(
-            height: 0.4.sh,
-            padding: EdgeInsets.all(16.sp),
-            margin: EdgeInsets.all(16.sp),
+            height: 200,
+            padding: const EdgeInsets.all(8.0),
+            margin: const EdgeInsets.all(8.0),
             child: Form(
               key: formKey,
               child: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(16.0.sp),
+                    padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
                       controller: textControllerTitle,
                       autofocus: true,
@@ -141,7 +126,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(16.0.sp),
+                    padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
                       controller: textControllerContent,
                       decoration: const InputDecoration(
@@ -165,9 +150,9 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(32.0.sp),
+                    padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(fixedSize: Size(0.3.sw, 0.06.sh)),
+                      style: ElevatedButton.styleFrom(fixedSize: const Size(30, 20)),
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
                           formKey.currentState!.save();
@@ -179,6 +164,7 @@ class _HomePageState extends State<HomePage> {
                             SentenceModel sentenceModel = SentenceModel(id: id, title: title, content: content, isRating: 0, coTitle: coTitle);
 
                             fireStore.doc('Sentence/$id').set(sentenceModel.toJson());
+                            mainController.sentenceList.add(sentenceModel);
 
                             textControllerTitle.clear();
                             textControllerContent.clear();
@@ -190,6 +176,7 @@ class _HomePageState extends State<HomePage> {
                             selectedSentence.coTitle = coTitle;
 
                             fireStore.doc('Sentence/${selectedSentence.id}').update(selectedSentence.toJson());
+                            mainController.updateSentence(selectedSentence);
                             Get.back();
                             Get.snackbar('', 'Güncelleme işlemi başarılı');
                           }
@@ -215,9 +202,5 @@ class _HomePageState extends State<HomePage> {
     }
 
     return temp.toLowerCase();
-  }
-
-  void showSearchPage() {
-    showSearch(context: context, delegate: CustomSearchPage(updateSentence: getModalBottomSheet));
   }
 }

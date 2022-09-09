@@ -6,8 +6,6 @@ import 'package:lugat_admin/ui/pages/log_in_page.dart';
 import '../../ui/pages/home_page.dart';
 import '../../ui/pages/page_not_found.dart';
 
-
-
 /// Created by Yunus Emre Yıldırım
 /// on 24.08.2022
 
@@ -18,7 +16,7 @@ class RouteGenerator {
         return _getPageRoute(const HomePage(), settings);
 
       case '/login':
-        return _getPageRoute(const LogInPage(), settings);
+        return _getPageRoute(const LoginPage(), settings);
 
       default:
         return _getPageRoute(const PageNotFound(), settings);

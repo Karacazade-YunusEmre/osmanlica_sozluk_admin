@@ -1,31 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
+import '/controllers/main_controller.dart';
 import 'firebase_options.dart';
 import 'utilities/constants/route_generator.dart';
+import 'utilities/constants/ui_constant.dart';
 
 late FirebaseAuth user;
 late FirebaseFirestore fireStore;
+late QuerySnapshot<Map<String, dynamic>> sentenceCollection;
 
 void main() async {
   await init;
   await initFirebase;
-  runApp(EasyLocalization(
-    supportedLocales: const [Locale('en', 'US'), Locale('tr', 'TR')],
-    path: 'assets/translation',
-    fallbackLocale: const Locale('tr', 'TR'),
-    child: const MainApp(),
-  ));
+  setupController;
+  runApp(const MainApp());
 }
 
 Future<void> get init async {
   WidgetsFlutterBinding.ensureInitialized();
-  await EasyLocalization.ensureInitialized();
 }
 
 Future<void> get initFirebase async {
@@ -34,6 +31,11 @@ Future<void> get initFirebase async {
   );
   user = FirebaseAuth.instance;
   fireStore = FirebaseFirestore.instance;
+  sentenceCollection = await fireStore.collection('Sentence').get();
+}
+
+void get setupController {
+  Get.put(MainController());
 }
 
 class MainApp extends StatelessWidget {
@@ -41,21 +43,22 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      splitScreenMode: true,
-      minTextAdapt: true,
-      designSize: const Size(1440, 2960),
+    return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Lugat Admin',
+      theme: defaultThemeData,
+      onGenerateRoute: RouteGenerator.getRoutes,
       builder: (BuildContext context, Widget? child) {
-        return GetMaterialApp(
-          debugShowCheckedModeBanner: false,
-          localizationsDelegates: context.localizationDelegates,
-          supportedLocales: context.supportedLocales,
-          locale: context.deviceLocale,
-          title: 'Lugat Admin',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          onGenerateRoute: RouteGenerator.getRoutes,
+        return ResponsiveWrapper.builder(
+          child,
+          maxWidth: 1200,
+          minWidth: 480,
+          defaultScale: true,
+          breakpoints: const [
+            ResponsiveBreakpoint.resize(480, name: MOBILE),
+            ResponsiveBreakpoint.autoScale(800, name: TABLET),
+            ResponsiveBreakpoint.resize(1000, name: DESKTOP),
+          ],
         );
       },
     );

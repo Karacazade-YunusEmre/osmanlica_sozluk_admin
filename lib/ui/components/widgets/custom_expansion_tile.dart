@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:lugat_admin/main.dart';
 import 'package:lugat_admin/models/concrete/sentence_model.dart';
+
+import '../../../controllers/main_controller.dart';
 
 /// Created by Yunus Emre Yıldırım
 /// on 25.08.2022
@@ -264,6 +265,7 @@ class CustomExpansionTile extends StatefulWidget {
 }
 
 class CustomExpansionTileState extends State<CustomExpansionTile> with SingleTickerProviderStateMixin {
+  late Size _screenSize;
   static final Animatable<double> _easeOutTween = CurveTween(curve: Curves.easeOut);
   static final Animatable<double> _easeInTween = CurveTween(curve: Curves.easeIn);
   static final Animatable<double> _halfTween = Tween<double>(begin: 0.0, end: 0.5);
@@ -282,6 +284,7 @@ class CustomExpansionTileState extends State<CustomExpansionTile> with SingleTic
   late Animation<Color?> _backgroundColor;
 
   bool _isExpanded = false;
+  late final MainController mainController;
 
   @override
   void initState() {
@@ -296,12 +299,17 @@ class CustomExpansionTileState extends State<CustomExpansionTile> with SingleTic
 
     _isExpanded = PageStorage.of(context)?.readState(context) as bool? ?? widget.initiallyExpanded;
     if (_isExpanded) _controller.value = 1.0;
+
+    mainController = Get.find();
+    _screenSize = MediaQuery.of(context).size;
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+
+    mainController.dispose();
   }
 
   void expand() {
@@ -414,8 +422,8 @@ class CustomExpansionTileState extends State<CustomExpansionTile> with SingleTic
                 ),
               ),
               Positioned(
-                top: 0.005.sh,
-                left: 0.85.sw,
+                top: _screenSize.height * 0.005,
+                left: _screenSize.width * 0.85,
                 child: IconButton(
                   icon: const Icon(
                     Icons.update_rounded,
@@ -424,8 +432,8 @@ class CustomExpansionTileState extends State<CustomExpansionTile> with SingleTic
                 ),
               ),
               Positioned(
-                top: 0.005.sh,
-                left: 0.9.sw,
+                top: _screenSize.height * 0.005,
+                left: _screenSize.width * 0.9,
                 child: IconButton(
                   icon: const Icon(
                     Icons.restore_from_trash_rounded,
@@ -443,6 +451,7 @@ class CustomExpansionTileState extends State<CustomExpansionTile> with SingleTic
                         ElevatedButton(
                           onPressed: () {
                             fireStore.doc('Sentence/${widget.currentSentence.id}').delete();
+                            mainController.sentenceList.remove(widget.currentSentence);
                             Get.back();
                             Get.snackbar('', 'Silme işlemi başarılı.');
                           },
