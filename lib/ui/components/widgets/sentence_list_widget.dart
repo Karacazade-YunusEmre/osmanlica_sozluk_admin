@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '/ui/components/widgets/sentence_item_widget.dart';
 import '../../../controllers/main_controller.dart';
@@ -47,15 +48,26 @@ class _SentenceListWidgetState extends State<SentenceListWidget> {
           width: screenSize.width * 0.5,
           height: screenSize.height,
           padding: const EdgeInsets.all(8.0),
-          child: ListView.builder(
-            itemCount: mainController.sentenceList.length,
-            itemBuilder: (BuildContext context, int index) {
-              SentenceModel currentSentence = mainController.sentenceList[index];
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SentenceItemWidget(sentenceModel: currentSentence),
-              );
-            },
+          child: AnimationLimiter(
+            child: ListView.builder(
+              itemCount: mainController.sentenceList.length,
+              itemBuilder: (BuildContext context, int index) {
+                SentenceModel currentSentence = mainController.sentenceList[index];
+                return AnimationConfiguration.staggeredList(
+                  position: index,
+                  duration: const Duration(seconds: 2),
+                  child: SlideAnimation(
+                    verticalOffset: 50.0,
+                    child: FadeInAnimation(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SentenceItemWidget(sentenceModel: currentSentence),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),
