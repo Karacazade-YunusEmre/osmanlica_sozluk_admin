@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 
 import '../../main.dart';
-import '../../utilities/custom_class/regex.dart';
+import '../../utilities/custom_class/utilities_class.dart';
 
 /// Created by Yunus Emre Yıldırım
 /// on 24.08.2022
@@ -62,7 +62,7 @@ class LoginPage extends StatelessWidget {
   String? _userValidator(String? value) {
     if (value != null && value.isEmpty) {
       return 'Email alanı boş geçilemez';
-    } else if (value != null && !Regex.email.hasMatch(value)) {
+    } else if (value != null && !UtilitiesClass.emailRegExp.hasMatch(value)) {
       return 'Geçersiz email';
     }
     return null;

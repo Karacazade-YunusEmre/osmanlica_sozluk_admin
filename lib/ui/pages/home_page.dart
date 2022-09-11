@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../utilities/custom_class/utilities_class.dart';
+import '../components/widgets/sentence_list_widget.dart';
 import '/models/concrete/sentence_model.dart';
 import '../../controllers/main_controller.dart';
 import '../../main.dart';
@@ -18,8 +20,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late final MainController mainController;
-  late final TextEditingController searchBarController;
+  late MainController mainController;
+  late TextEditingController searchBarController;
 
   @override
   void initState() {
@@ -41,6 +43,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     mainController.dispose();
+    searchBarController.dispose();
+
     super.dispose();
   }
 
@@ -72,8 +76,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      // body: SentenceListWidget(sentenceList: mainController.sentenceList, updateSentence: getModalBottomSheet),
-      body: Container(),
+      body: SentenceListWidget(updateSentence: getModalBottomSheet),
       floatingActionButton: FloatingActionButton(
         onPressed: () => getModalBottomSheet(null),
         child: const Icon(Icons.add_box),
@@ -156,7 +159,7 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
                           formKey.currentState!.save();
-                          String coTitle = getCoTitle(title);
+                          String coTitle = UtilitiesClass.getCoTitle(title);
 
                           if (selectedSentence == null) {
                             String id = fireStore.collection('Sentence').doc().id;
@@ -190,17 +193,5 @@ class _HomePageState extends State<HomePage> {
             ),
           );
         });
-  }
-
-  String getCoTitle(String title) {
-    String temp = title;
-
-    List<String> patternList = [' ', '-', "'", '(', ')', '.', ':', ',', ';', '{', '}', '[', ']', '!', '?'];
-
-    for (String item in patternList) {
-      temp = temp.split(item).join();
-    }
-
-    return temp.toLowerCase();
   }
 }

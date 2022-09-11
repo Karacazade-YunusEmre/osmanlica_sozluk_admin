@@ -1,72 +1,64 @@
 import 'package:flutter/material.dart';
-import 'package:lugat_admin/ui/components/widgets/custom_expansion_tile.dart';
+import 'package:get/get.dart';
 
+import '/ui/components/widgets/sentence_item_widget.dart';
+import '../../../controllers/main_controller.dart';
 import '../../../models/concrete/sentence_model.dart';
 
 /// Created by Yunus Emre Yıldırım
 /// on 25.08.2022
 
 class SentenceListWidget extends StatefulWidget {
-  final List<SentenceModel> sentenceList;
   final void Function(SentenceModel) updateSentence;
 
-  const SentenceListWidget({Key? key, required this.sentenceList, required this.updateSentence}) : super(key: key);
+  const SentenceListWidget({Key? key, required this.updateSentence}) : super(key: key);
 
   @override
   State<SentenceListWidget> createState() => _SentenceListWidgetState();
 }
 
 class _SentenceListWidgetState extends State<SentenceListWidget> {
-  late Size _screenSize;
+  late MainController mainController;
+
+  @override
+  void initState() {
+    mainController = Get.find();
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    mainController.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    _screenSize = MediaQuery.of(context).size;
+    final Size screenSize = MediaQuery.of(context).size;
 
-    return ListView.builder(
-      itemCount: widget.sentenceList.length,
-      itemBuilder: (BuildContext context, int index) {
-        SentenceModel currentSentence = widget.sentenceList[index];
-        return CustomExpansionTile(
-          currentSentence: currentSentence,
-          updateFunction: widget.updateSentence,
-          title: Container(
-            margin: const EdgeInsets.all(8.0),
-            padding: const EdgeInsets.all(32.0),
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(20)),
-              color: Theme.of(context).primaryColor.withOpacity(0.7),
-            ),
-            child: Center(
-              child: Text(
-                currentSentence.title,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+    return Container(
+      width: screenSize.width,
+      height: screenSize.height,
+      color: const Color(0xFF4FC3F7),
+      child: Center(
+        child: Container(
+          width: screenSize.width * 0.5,
+          height: screenSize.height,
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.builder(
+            itemCount: mainController.sentenceList.length,
+            itemBuilder: (BuildContext context, int index) {
+              SentenceModel currentSentence = mainController.sentenceList[index];
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SentenceItemWidget(sentenceModel: currentSentence),
+              );
+            },
           ),
-          children: [
-            Container(
-              margin: const EdgeInsets.all(8.0),
-              padding: const EdgeInsets.all(8.0),
-              width: _screenSize.width * 0.9,
-              alignment: Alignment.bottomCenter,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                color: Theme.of(context).primaryColor.withOpacity(0.7),
-              ),
-              child: Text(
-                currentSentence.content,
-                style: const TextStyle(fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
-        );
-      },
+        ),
+      ),
     );
   }
 }
