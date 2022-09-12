@@ -60,7 +60,7 @@ class _SentenceListWidgetState extends State<SentenceListWidget> {
                       child: FadeInAnimation(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: SentenceItemWidget(sentenceModel: currentSentence),
+                          child: SentenceItemWidget(currentSentence: currentSentence),
                         ),
                       ),
                     ),

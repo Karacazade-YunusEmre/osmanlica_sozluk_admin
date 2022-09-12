@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:lugat_admin/main.dart';
 
+import '../../../controllers/main_controller.dart';
 import '../../../models/concrete/sentence_model.dart';
 
 class SentenceItemWidget extends StatefulWidget {
-  final SentenceModel sentenceModel;
+  final SentenceModel currentSentence;
 
-  const SentenceItemWidget({super.key, required this.sentenceModel});
+  const SentenceItemWidget({super.key, required this.currentSentence});
 
   @override
   State<SentenceItemWidget> createState() => _SentenceItemWidgetState();
 }
 
 class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTickerProviderStateMixin {
+  late MainController mainController;
   final Duration defaultAnimationDuration = const Duration(milliseconds: 200);
   final bool initiallyExpanded = false;
 
@@ -35,6 +39,7 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
   void initState() {
     super.initState();
 
+    mainController = Get.find();
     _animationController = AnimationController(duration: defaultAnimationDuration, vsync: this);
 
     _iconTurns = _animationController.drive(_halfTween.chain(_easeInTween));
@@ -77,7 +82,7 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
                   children: [
                     ListTile(
                       onTap: _handleTap,
-                      title: Text(widget.sentenceModel.title),
+                      title: Text(widget.currentSentence.title),
                       trailing: _buildTrailingIcon(context),
                     ),
                     Positioned(
@@ -89,7 +94,51 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
                           color: Colors.black54,
                         ),
                         onTap: () {
-                          debugPrint('${widget.sentenceModel.id} item delete');
+                          try {
+
+
+                            Get.defaultDialog(
+                              title: 'UYARI',
+                              middleText: 'Seçilen cümleyi silmek istediğinizden emin misiniz?',
+                              backgroundColor: Colors.red.shade400,
+                              titleStyle: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              middleTextStyle: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
+                              radius: 30,
+                              barrierDismissible: false,
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    fireStore.doc('Sentence/${widget.currentSentence.id}').delete();
+                                    mainController.sentenceList.remove(widget.currentSentence);
+                                    Get.back();
+                                    Get.snackbar(
+                                      'UYARI',
+                                      'Cümle başarıyla silindi.',
+                                      borderColor: Colors.red,
+                                      borderWidth: 2,
+                                      snackPosition: SnackPosition.BOTTOM,
+                                      maxWidth: MediaQuery.of(context).size.width * 0.4,
+                                    );
+                                  },
+                                  child: const Text('EVET'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Get.back(),
+                                  child: const Text('HAYIR'),
+                                ),
+                              ],
+                            );
+
+                          } catch (e) {
+                            debugPrint('Silme işleminde hata oluştu. ${e.toString()}');
+                          }
                         },
                       ),
                     ),
@@ -102,7 +151,7 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
                           color: Colors.black54,
                         ),
                         onTap: () {
-                          debugPrint('${widget.sentenceModel.id} item update');
+                          debugPrint('${widget.currentSentence.id} item update');
                         },
                       ),
                     ),
@@ -138,7 +187,7 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    widget.sentenceModel.content,
+                    widget.currentSentence.content,
                     style: const TextStyle(fontSize: 18, color: Colors.blue, fontStyle: FontStyle.italic),
                   ),
                 ),
