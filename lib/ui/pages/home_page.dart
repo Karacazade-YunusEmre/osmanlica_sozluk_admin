@@ -6,7 +6,7 @@ import '../../controllers/main_controller.dart';
 import '../../main.dart';
 import '../components/widgets/search_bar_widget.dart';
 import '../components/widgets/sentence_list_widget.dart';
-import '../dialogs/sentence_add_dialog.dart';
+import '../dialogs/sentence_add_update_dialog.dart';
 
 /// Created by Yunus Emre Yıldırım
 /// on 24.08.2022
@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: const SentenceListWidget(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => SentenceAddDialog(currentSentence: null),
+        onPressed: () => SentenceAddUpdateDialog(currentSentence: null),
         child: const Icon(Icons.add_box),
       ),
       resizeToAvoidBottomInset: false,

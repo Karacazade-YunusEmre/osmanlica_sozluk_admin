@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lugat_admin/main.dart';
+import 'package:lugat_admin/ui/dialogs/sentence_add_update_dialog.dart';
 
 import '../../../controllers/main_controller.dart';
 import '../../../models/concrete/sentence_model.dart';
@@ -80,11 +81,14 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
                 textColor: _headerColor.value,
                 child: Stack(
                   children: [
+                    /// sentence item listTile
                     ListTile(
                       onTap: _handleTap,
                       title: Text(widget.currentSentence.title),
                       trailing: _buildTrailingIcon(context),
                     ),
+
+                    /// sentence item remove button
                     Positioned(
                       top: 12,
                       right: 50,
@@ -95,8 +99,6 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
                         ),
                         onTap: () {
                           try {
-
-
                             Get.defaultDialog(
                               title: 'UYARI',
                               middleText: 'Seçilen cümleyi silmek istediğinizden emin misiniz?',
@@ -135,13 +137,14 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
                                 ),
                               ],
                             );
-
                           } catch (e) {
                             debugPrint('Silme işleminde hata oluştu. ${e.toString()}');
                           }
                         },
                       ),
                     ),
+
+                    /// sentence item update button
                     Positioned(
                       top: 12,
                       right: 90,
@@ -150,9 +153,7 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
                           Icons.recycling_rounded,
                           color: Colors.black54,
                         ),
-                        onTap: () {
-                          debugPrint('${widget.currentSentence.id} item update');
-                        },
+                        onTap: () => SentenceAddUpdateDialog(currentSentence: widget.currentSentence),
                       ),
                     ),
                   ],

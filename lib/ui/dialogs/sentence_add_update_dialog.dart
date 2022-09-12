@@ -9,7 +9,7 @@ import '../../utilities/custom_class/utilities_class.dart';
 /// Created by Yunus Emre Yıldırım
 /// on 12.09.2022
 
-class SentenceAddDialog {
+class SentenceAddUpdateDialog {
   final formKey = GlobalKey<FormState>();
 
   final SentenceModel? currentSentence;
@@ -22,9 +22,9 @@ class SentenceAddDialog {
   String title = '';
   String content = '';
 
-  SentenceAddDialog({required this.currentSentence}) {
-    textControllerTitle = TextEditingController();
-    textControllerContent = TextEditingController();
+  SentenceAddUpdateDialog({required this.currentSentence}) {
+    textControllerTitle = TextEditingController(text: currentSentence != null ? currentSentence!.title : '');
+    textControllerContent = TextEditingController(text: currentSentence != null ? currentSentence!.content : '');
     mainController = Get.find();
 
     showSentenceAddDialog;
@@ -32,7 +32,7 @@ class SentenceAddDialog {
 
   void get showSentenceAddDialog {
     Get.defaultDialog(
-      title: 'Kelime Ekleyin',
+      title: currentSentence != null ? 'Cümleyi Güncelleyin' : 'Cümle Ekleyin',
       titleStyle: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
       content: SizedBox(
         width: 400,
@@ -74,30 +74,45 @@ class SentenceAddDialog {
                       if (formKey.currentState!.validate()) {
                         formKey.currentState!.save();
 
-                        try {
-                          String id = fireStore.collection('Sentence').doc().id;
-                          String coTitle = UtilitiesClass.getCoTitle(title);
-                          SentenceModel sentence = SentenceModel(id: id, title: title, content: content, isRating: 0, coTitle: coTitle);
-                          fireStore.doc('Sentence/$id').set(sentence.toJson());
-                          mainController.sentenceList.add(sentence);
+                        /// for update sentence
+                        if (currentSentence != null) {
+                          int index = mainController.sentenceList.indexOf(currentSentence);
 
-                          textControllerTitle.clear();
-                          textControllerContent.clear();
-                          Get.back();
-                          Get.snackbar(
-                            'BİLGİ',
-                            'Cümle başarıyla kaydedildi.',
-                            borderColor: Colors.green,
-                            borderWidth: 2,
-                            snackPosition: SnackPosition.BOTTOM,
-                            maxWidth: MediaQuery.of(context).size.width * 0.4,
-                          );
-                        } catch (e) {
-                          debugPrint('Hata oluştu. ${e.toString()}');
+                          String coTitle = UtilitiesClass.getCoTitle(title);
+                          currentSentence!.title = title;
+                          currentSentence!.content = content;
+                          currentSentence!.coTitle = coTitle;
+
+                          fireStore.doc('Sentence/${currentSentence!.id}').update(currentSentence!.toJson());
+                          mainController.sentenceList[index] = currentSentence!;
                         }
+
+                        /// for add sentence
+                        else {
+                          try {
+                            String id = fireStore.collection('Sentence').doc().id;
+                            String coTitle = UtilitiesClass.getCoTitle(title);
+                            SentenceModel sentence = SentenceModel(id: id, title: title, content: content, isRating: 0, coTitle: coTitle);
+                            fireStore.doc('Sentence/$id').set(sentence.toJson());
+                            mainController.sentenceList.add(sentence);
+                          } catch (e) {
+                            debugPrint('Hata oluştu. ${e.toString()}');
+                          }
+                        }
+                        textControllerTitle.clear();
+                        textControllerContent.clear();
+                        Get.back();
+                        Get.snackbar(
+                          'BİLGİ',
+                          currentSentence == null ? 'Cümle başarıyla kaydedildi.' : 'Cümle başarıyla güncellendi',
+                          borderColor: Colors.green,
+                          borderWidth: 2,
+                          snackPosition: SnackPosition.BOTTOM,
+                          maxWidth: MediaQuery.of(context).size.width * 0.4,
+                        );
                       }
                     },
-                    child: const Text('KAYDET'),
+                    child: Text(currentSentence != null ? 'Güncelle' : 'KAYDET'),
                   );
                 },
               )
