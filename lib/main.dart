@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:url_strategy/url_strategy.dart';
 
 import '/controllers/main_controller.dart';
 import 'firebase_options.dart';
@@ -15,14 +16,15 @@ late FirebaseFirestore fireStore;
 late QuerySnapshot<Map<String, dynamic>> sentenceCollection;
 
 void main() async {
-  await init;
+  init;
   await initFirebase;
   setupController;
   runApp(const MainApp());
 }
 
-Future<void> get init async {
+void get init {
   WidgetsFlutterBinding.ensureInitialized();
+  setPathUrlStrategy();
 }
 
 Future<void> get initFirebase async {
