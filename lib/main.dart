@@ -7,7 +7,7 @@ import 'package:responsive_framework/responsive_framework.dart';
 
 import '/controllers/main_controller.dart';
 import 'firebase_options.dart';
-import 'utilities/constants/route_generator.dart';
+import 'utilities/constants/routes.dart';
 import 'utilities/constants/ui_constant.dart';
 
 late FirebaseAuth user;
@@ -26,9 +26,7 @@ Future<void> get init async {
 }
 
 Future<void> get initFirebase async {
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   user = FirebaseAuth.instance;
   fireStore = FirebaseFirestore.instance;
   sentenceCollection = await fireStore.collection('Sentence').get();
@@ -47,7 +45,7 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Lugat Admin',
       theme: defaultThemeData,
-      onGenerateRoute: RouteGenerator.getRoutes,
+      getPages: routes,
       builder: (BuildContext context, Widget? child) {
         return ResponsiveWrapper.builder(
           child,

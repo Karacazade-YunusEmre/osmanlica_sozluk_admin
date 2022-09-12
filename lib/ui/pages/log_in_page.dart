@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
+import 'package:get/get.dart';
 
 import '../../main.dart';
 import '../../utilities/custom_class/utilities_class.dart';
@@ -11,7 +12,7 @@ import '../../utilities/custom_class/utilities_class.dart';
 class LoginPage extends StatelessWidget {
   const LoginPage({Key? key}) : super(key: key);
 
-  Duration get loginTime => const Duration(milliseconds: 1250);
+  Duration get loginTime => const Duration(milliseconds: 750);
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class LoginPage extends StatelessWidget {
       passwordValidator: _passwordValidator,
       onRecoverPassword: _recoverPassword,
       hideForgotPasswordButton: true,
-      onSubmitAnimationCompleted: () => Navigator.pushNamed(context, '/'),
+      onSubmitAnimationCompleted: () => Get.offAndToNamed('/'),
     );
   }
 

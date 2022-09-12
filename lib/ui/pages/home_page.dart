@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
 
     user.authStateChanges().listen((User? user) {
       if (user == null) {
-        Navigator.pushNamed(context, '/login');
+        Get.toNamed('/login');
         debugPrint('User is currently signed out!');
       } else {
         debugPrint('User is signed in!');
