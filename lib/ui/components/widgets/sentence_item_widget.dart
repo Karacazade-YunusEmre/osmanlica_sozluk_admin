@@ -109,15 +109,15 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
                   ],
                 ),
               ),
-              _isExpanded
-                  ? const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Divider(
-                        color: Colors.black38,
-                        height: 2,
-                      ),
-                    )
-                  : const SizedBox(),
+              // _isExpanded
+              //     ? const Padding(
+              //         padding: EdgeInsets.symmetric(horizontal: 8.0),
+              //         child: Divider(
+              //           color: Colors.black38,
+              //           height: 2,
+              //         ),
+              //       )
+              //     : const SizedBox(),
               ClipRect(
                 child: Align(
                   alignment: Alignment.center,
@@ -137,7 +137,10 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
                 enabled: !closed,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(widget.sentenceModel.content),
+                  child: Text(
+                    widget.sentenceModel.content,
+                    style: const TextStyle(fontSize: 18, color: Colors.blue, fontStyle: FontStyle.italic),
+                  ),
                 ),
               ),
             ),

@@ -10,9 +10,7 @@ import '../../../models/concrete/sentence_model.dart';
 /// on 25.08.2022
 
 class SentenceListWidget extends StatefulWidget {
-  final void Function(SentenceModel) updateSentence;
-
-  const SentenceListWidget({Key? key, required this.updateSentence}) : super(key: key);
+  const SentenceListWidget({Key? key}) : super(key: key);
 
   @override
   State<SentenceListWidget> createState() => _SentenceListWidgetState();
@@ -39,34 +37,36 @@ class _SentenceListWidgetState extends State<SentenceListWidget> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
 
-    return Container(
-      width: screenSize.width,
-      height: screenSize.height,
-      color: const Color(0xFF4FC3F7),
-      child: Center(
-        child: Container(
-          width: screenSize.width * 0.5,
-          height: screenSize.height,
-          padding: const EdgeInsets.all(8.0),
-          child: AnimationLimiter(
-            child: ListView.builder(
-              itemCount: mainController.sentenceList.length,
-              itemBuilder: (BuildContext context, int index) {
-                SentenceModel currentSentence = mainController.sentenceList[index];
-                return AnimationConfiguration.staggeredList(
-                  position: index,
-                  duration: const Duration(seconds: 2),
-                  child: SlideAnimation(
-                    verticalOffset: 50.0,
-                    child: FadeInAnimation(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SentenceItemWidget(sentenceModel: currentSentence),
+    return Obx(
+      () => Container(
+        width: screenSize.width,
+        height: screenSize.height,
+        color: const Color(0xFF4FC3F7),
+        child: Center(
+          child: Container(
+            width: screenSize.width * 0.5,
+            height: screenSize.height,
+            padding: const EdgeInsets.all(8.0),
+            child: AnimationLimiter(
+              child: ListView.builder(
+                itemCount: mainController.sentenceList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  SentenceModel currentSentence = mainController.sentenceList[index];
+                  return AnimationConfiguration.staggeredList(
+                    position: index,
+                    duration: const Duration(seconds: 2),
+                    child: SlideAnimation(
+                      verticalOffset: 50.0,
+                      child: FadeInAnimation(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SentenceItemWidget(sentenceModel: currentSentence),
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
         ),
