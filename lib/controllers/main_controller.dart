@@ -11,7 +11,6 @@ class MainController extends GetxController {
   final sentenceList = <SentenceModel>[].obs;
 
   List<SentenceModel> allSentenceList = [];
-  String searchingQuery = '';
 
   @override
   Future<void> onInit() async {
@@ -30,26 +29,25 @@ class MainController extends GetxController {
   }
 
   void searchSentence(String query) {
-    searchingQuery = query;
     List<SentenceModel> filteredList = [];
     if (query.isEmpty) {
       filteredList = allSentenceList;
     } else {
       filteredList = [];
-      filteredList = allSentenceList.where((element) => getCoTitle(element.title).contains(query.toLowerCase())).toList();
+      filteredList = allSentenceList.where((element) => removeUnAlphanumericCharacters(element.title).contains(removeUnAlphanumericCharacters(query))).toList();
     }
     sentenceList.value = filteredList;
   }
 
-   String getCoTitle(String title) {
-     List<String> tempCharacters = [];
-     RegExp regexCoTitle = RegExp(r'[a-zA-Z0-9öçşığüÖÇŞIĞÜ]+', multiLine: true);
-     Iterable<RegExpMatch> matches = regexCoTitle.allMatches(title.toLowerCase());
+  String removeUnAlphanumericCharacters(String str) {
+    List<String> tempCharacters = [];
+    RegExp regexCoTitle = RegExp(r'[a-zA-Z0-9öçşığüÖÇŞIĞÜ]+', multiLine: true);
+    Iterable<RegExpMatch> matches = regexCoTitle.allMatches(str.toLowerCase());
 
-     for (RegExpMatch item in matches) {
-       tempCharacters.add(item[0]!.toLowerCase());
-     }
+    for (RegExpMatch item in matches) {
+      tempCharacters.add(item[0]!.toLowerCase());
+    }
 
-     return tempCharacters.join();
+    return tempCharacters.join();
   }
 }
