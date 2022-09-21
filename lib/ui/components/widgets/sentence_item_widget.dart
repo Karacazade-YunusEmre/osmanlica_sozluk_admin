@@ -159,15 +159,6 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
                   ],
                 ),
               ),
-              // _isExpanded
-              //     ? const Padding(
-              //         padding: EdgeInsets.symmetric(horizontal: 8.0),
-              //         child: Divider(
-              //           color: Colors.black38,
-              //           height: 2,
-              //         ),
-              //       )
-              //     : const SizedBox(),
               ClipRect(
                 child: Align(
                   alignment: Alignment.center,

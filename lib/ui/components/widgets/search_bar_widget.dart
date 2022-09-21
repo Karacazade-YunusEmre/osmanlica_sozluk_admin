@@ -1,14 +1,15 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../../controllers/main_controller.dart';
 
 /// Created by Yunus Emre Yıldırım
 /// on 9.09.2022
 
 class SearchBarWidget extends StatefulWidget {
-  final TextEditingController textController;
-
-  const SearchBarWidget({Key? key, required this.textController}) : super(key: key);
+  const SearchBarWidget({Key? key}) : super(key: key);
 
   @override
   State<SearchBarWidget> createState() => _SearchBarWidgetState();
@@ -17,15 +18,19 @@ class SearchBarWidget extends StatefulWidget {
 class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProviderStateMixin {
   /// toggle == 1 is search bar expand, toggle == 0 is search bar collapse
   int toggle = 0;
+  late TextEditingController textController;
   final double searchBarWidth = 400;
   late Duration defaultAnimationDuration;
   late AnimationController animationController;
   late FocusNode focusNode;
+  late MainController mainController;
 
   @override
   void initState() {
     super.initState();
 
+    mainController = Get.find();
+    textController = TextEditingController();
     defaultAnimationDuration = const Duration(milliseconds: 500);
     animationController = AnimationController(vsync: this, duration: defaultAnimationDuration);
     focusNode = FocusNode();
@@ -35,6 +40,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
   void dispose() {
     animationController.dispose();
     focusNode.dispose();
+    mainController.dispose();
 
     super.dispose();
   }
@@ -75,11 +81,11 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
                           );
                         },
                         child: InkWell(
-                          onTap: () => widget.textController.clear(),
-                          child: const Icon(
-                            Icons.close,
-                            size: 24,
-                          ),
+                          onTap: () {
+                            textController.clear();
+                            mainController.sentenceList.value = mainController.allSentenceList;
+                          },
+                          child: const Icon(Icons.close, size: 24),
                         ),
                       ),
                     ),
@@ -101,19 +107,14 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
                     alignment: Alignment.topCenter,
                     width: searchBarWidth / 1.5,
                     child: TextField(
-                      controller: widget.textController,
+                      controller: textController,
                       autofocus: true,
                       focusNode: focusNode,
                       cursorRadius: const Radius.circular(10.0),
                       cursorWidth: 2.0,
-                      onEditingComplete: () {
-                        /// on editing complete the keyboard will be closed and the search bar will be closed
-                        // onFocusKeyboard();
-                        // setState(() {
-                        //   toggle = 0;
-                        // });
-                        widget.textController.clear();
-                      },
+                      onEditingComplete: () => textController.clear(),
+                      onChanged: mainController.searchSentence,
+                      textInputAction: TextInputAction.search,
                       style: const TextStyle(color: Colors.black54),
                       cursorColor: Colors.black.withOpacity(0.5),
                       decoration: InputDecoration(

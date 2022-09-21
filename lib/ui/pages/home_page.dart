@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/main_controller.dart';
 import '../../main.dart';
 import '../components/widgets/search_bar_widget.dart';
 import '../components/widgets/sentence_list_widget.dart';
@@ -19,9 +18,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late MainController mainController;
-  late TextEditingController searchBarController;
-
   @override
   void initState() {
     super.initState();
@@ -34,16 +30,10 @@ class _HomePageState extends State<HomePage> {
         debugPrint('User is signed in!');
       }
     });
-
-    mainController = Get.find();
-    searchBarController = TextEditingController();
   }
 
   @override
   void dispose() {
-    mainController.dispose();
-    searchBarController.dispose();
-
     super.dispose();
   }
 
@@ -56,11 +46,9 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Lugat Yönetici Paneli'),
         centerTitle: true,
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SearchBarWidget(
-              textController: searchBarController,
-            ),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: SearchBarWidget(),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),

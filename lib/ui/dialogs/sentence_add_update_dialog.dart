@@ -4,7 +4,6 @@ import 'package:lugat_admin/main.dart';
 
 import '../../controllers/main_controller.dart';
 import '../../models/concrete/sentence_model.dart';
-import '../../utilities/custom_class/utilities_class.dart';
 
 /// Created by Yunus Emre Yıldırım
 /// on 12.09.2022
@@ -76,12 +75,10 @@ class SentenceAddUpdateDialog {
 
                         /// for update sentence
                         if (currentSentence != null) {
-                          int index = mainController.sentenceList.indexOf(currentSentence);
+                          int index = mainController.sentenceList.indexOf(currentSentence!);
 
-                          String coTitle = UtilitiesClass.getCoTitle(title);
                           currentSentence!.title = title;
                           currentSentence!.content = content;
-                          currentSentence!.coTitle = coTitle;
 
                           fireStore.doc('Sentence/${currentSentence!.id}').update(currentSentence!.toJson());
                           mainController.sentenceList[index] = currentSentence!;
@@ -91,8 +88,7 @@ class SentenceAddUpdateDialog {
                         else {
                           try {
                             String id = fireStore.collection('Sentence').doc().id;
-                            String coTitle = UtilitiesClass.getCoTitle(title);
-                            SentenceModel sentence = SentenceModel(id: id, title: title, content: content, isRating: 0, coTitle: coTitle);
+                            SentenceModel sentence = SentenceModel(id: id, title: title, content: content, isRating: 0);
                             fireStore.doc('Sentence/$id').set(sentence.toJson());
                             mainController.sentenceList.add(sentence);
                           } catch (e) {

@@ -52,9 +52,10 @@ class _SentenceListWidgetState extends State<SentenceListWidget> {
                 itemCount: mainController.sentenceList.length,
                 itemBuilder: (BuildContext context, int index) {
                   SentenceModel currentSentence = mainController.sentenceList[index];
+
                   return AnimationConfiguration.staggeredList(
                     position: index,
-                    duration: const Duration(seconds: 2),
+                    duration: const Duration(seconds: 1),
                     child: SlideAnimation(
                       verticalOffset: 50.0,
                       child: FadeInAnimation(
