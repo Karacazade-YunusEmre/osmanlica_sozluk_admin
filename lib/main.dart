@@ -47,7 +47,7 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Lugat Admin',
       theme: defaultThemeData,
-      initialRoute: user.currentUser == null ? '/login' : '/',
+      // initialRoute: user.currentUser == null ? '/login' : '/',
       getPages: GenerateRoute.getRoutes,
       builder: (BuildContext context, Widget? child) {
         return ResponsiveWrapper.builder(

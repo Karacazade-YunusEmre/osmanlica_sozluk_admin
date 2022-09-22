@@ -88,7 +88,7 @@ class SentenceAddUpdateDialog {
                         else {
                           try {
                             String id = fireStore.collection('Sentence').doc().id;
-                            SentenceModel sentence = SentenceModel(id: id, title: title, content: content, isRating: 0);
+                            SentenceModel sentence = SentenceModel(id: id, title: title, content: content);
                             fireStore.doc('Sentence/$id').set(sentence.toJson());
                             mainController.sentenceList.add(sentence);
                           } catch (e) {

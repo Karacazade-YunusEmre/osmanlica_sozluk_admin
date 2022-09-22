@@ -9,7 +9,6 @@ import '../main.dart';
 
 class MainController extends GetxController {
   final sentenceList = <SentenceModel>[].obs;
-
   List<SentenceModel> allSentenceList = [];
 
   @override

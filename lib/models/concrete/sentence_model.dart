@@ -11,9 +11,8 @@ class SentenceModel extends IBaseModel {
   String id;
   String title;
   String content;
-  int isRating;
 
-  SentenceModel({required this.id, required this.title, required this.content, required this.isRating});
+  SentenceModel({required this.id, required this.title, required this.content});
 
   factory SentenceModel.fromJson(Map<String, dynamic> json) => _$SentenceModelFromJson(json);
 
