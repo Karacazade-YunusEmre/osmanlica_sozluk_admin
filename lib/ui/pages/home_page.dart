@@ -1,11 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lugat_admin/main.dart';
 
-import '../../main.dart';
-import '../components/widgets/search_bar_widget.dart';
+import '../components/dialogs/sentence_add_update_dialog.dart';
+import '../components/widgets/home_page_app_bar.dart';
 import '../components/widgets/sentence_list_widget.dart';
-import '../dialogs/sentence_add_update_dialog.dart';
 
 /// Created by Yunus Emre Yıldırım
 /// on 24.08.2022
@@ -22,14 +21,25 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    user.authStateChanges().listen((User? user) {
-      if (user == null) {
-        Get.toNamed('/login');
-        debugPrint('User is currently signed out!');
-      } else {
-        debugPrint('User is signed in!');
-      }
-    });
+    // user.authStateChanges().listen((User? user) {
+    //   if (user == null) {
+    //     Get.toNamed('/login');
+    //     debugPrint('User is currently signed out!');
+    //   } else {
+    //     debugPrint('User is signed in!');
+    //   }
+    // });
+
+    checkUserCurrentState();
+  }
+
+  Future<void> checkUserCurrentState() async {
+    bool state = await serviceAuth.isUserSignIn();
+    if (state) {
+      debugPrint('User is signed in!');
+    } else {
+      Get.toNamed('/login');
+    }
   }
 
   @override
@@ -40,30 +50,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        elevation: 5,
-        title: const Text('Lugat Yönetici Paneli'),
-        centerTitle: true,
-        actions: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: SearchBarWidget(),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent.shade400.withOpacity(0.7),
-                shape: const StadiumBorder(),
-              ),
-              onPressed: () => user.signOut(),
-              child: const Text('Çıkış Yap'),
-            ),
-          ),
+      body: Column(
+        children: const [
+          HomePageAppBar(),
+          SentenceListWidget(),
         ],
       ),
-      body: const SentenceListWidget(),
       floatingActionButton: FloatingActionButton(
         onPressed: () => SentenceAddUpdateDialog(currentSentence: null),
         child: const Icon(Icons.add_box),

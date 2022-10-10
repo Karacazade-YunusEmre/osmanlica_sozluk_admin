@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
@@ -35,17 +36,15 @@ class _SentenceListWidgetState extends State<SentenceListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
-
     return Obx(
       () => Container(
-        width: screenSize.width,
-        height: screenSize.height,
-        color: const Color(0xFF4FC3F7),
+        width: 1.sw,
+        height: 0.9.sh,
+        color: Theme.of(context).backgroundColor,
         child: Center(
           child: Container(
-            width: screenSize.width * 0.5,
-            height: screenSize.height,
+            width: 0.5.sw,
+            height: 0.9.sh,
             padding: const EdgeInsets.all(8.0),
             child: AnimationLimiter(
               child: ListView.builder(
@@ -55,13 +54,13 @@ class _SentenceListWidgetState extends State<SentenceListWidget> {
 
                   return AnimationConfiguration.staggeredList(
                     position: index,
-                    duration: const Duration(seconds: 1),
+                    duration: const Duration(milliseconds: 500),
                     child: SlideAnimation(
                       verticalOffset: 50.0,
                       child: FadeInAnimation(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: SentenceItemWidget(currentSentence: currentSentence),
+                            child: SentenceItemWidget(currentSentence: currentSentence),
                         ),
                       ),
                     ),

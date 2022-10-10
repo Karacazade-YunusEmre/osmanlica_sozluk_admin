@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:lugat_admin/main.dart';
-import 'package:lugat_admin/ui/dialogs/sentence_add_update_dialog.dart';
 
 import '../../../controllers/main_controller.dart';
 import '../../../models/concrete/sentence_model.dart';
+import '../dialogs/sentence_add_update_dialog.dart';
 
 class SentenceItemWidget extends StatefulWidget {
   final SentenceModel currentSentence;
@@ -70,7 +70,7 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
       builder: (BuildContext context, Widget? child) {
         return Container(
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xff5B5B5B), style: BorderStyle.solid, width: 1),
+            border: Border.all(color: _isExpanded ? Theme.of(context).secondaryHeaderColor : Theme.of(context).primaryColor, style: BorderStyle.solid, width: 1),
             borderRadius: const BorderRadius.all(Radius.circular(20)),
           ),
           child: Column(
@@ -81,79 +81,84 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
                 textColor: _headerColor.value,
                 child: Stack(
                   children: [
-                    /// sentence item listTile
-                    ListTile(
-                      onTap: _handleTap,
-                      title: Text(widget.currentSentence.title),
-                      trailing: _buildTrailingIcon(context),
-                    ),
-
-                    /// sentence item remove button
                     Positioned(
-                      top: 12,
-                      right: 50,
-                      child: InkWell(
-                        child: const Icon(
-                          Icons.restore_from_trash_sharp,
-                          color: Colors.black54,
+                      child: ListTile(
+                        onTap: _handleTap,
+
+                        /// sentence title
+                        title: Text(
+                          widget.currentSentence.title,
+                          style: TextStyle(
+                            color: _isExpanded ? Theme.of(context).primaryColor : Theme.of(context).hintColor,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        onTap: () {
-                          try {
-                            Get.defaultDialog(
-                              title: 'UYARI',
-                              middleText: 'Seçilen cümleyi silmek istediğinizden emin misiniz?',
-                              backgroundColor: Colors.red.shade400,
-                              titleStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              middleTextStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                              ),
-                              radius: 30,
-                              barrierDismissible: false,
-                              actions: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    fireStore.doc('Sentence/${widget.currentSentence.id}').delete();
-                                    mainController.sentenceList.remove(widget.currentSentence);
-                                    Get.back();
-                                    Get.snackbar(
-                                      'UYARI',
-                                      'Cümle başarıyla silindi.',
-                                      borderColor: Colors.red,
-                                      borderWidth: 2,
-                                      snackPosition: SnackPosition.BOTTOM,
-                                      maxWidth: MediaQuery.of(context).size.width * 0.4,
-                                    );
-                                  },
-                                  child: const Text('EVET'),
-                                ),
-                                ElevatedButton(
-                                  onPressed: () => Get.back(),
-                                  child: const Text('HAYIR'),
-                                ),
-                              ],
-                            );
-                          } catch (e) {
-                            debugPrint('Silme işleminde hata oluştu. ${e.toString()}');
-                          }
-                        },
+                        trailing: _buildTrailingIcon(context),
                       ),
                     ),
 
-                    /// sentence item update button
+                    /// delete icon
                     Positioned(
-                      top: 12,
-                      right: 90,
-                      child: InkWell(
-                        child: const Icon(
-                          Icons.recycling_rounded,
-                          color: Colors.black54,
+                      right: 0.08.sw,
+                      top: 0.005.sh,
+                      child: IconButton(
+                        onPressed: () {
+                          Get.defaultDialog(
+                            title: 'UYARI',
+                            middleText: 'Seçilen cümleyi silmek istediğinizden emin misiniz?',
+                            backgroundColor: Colors.red.shade400,
+                            titleStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            middleTextStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                            ),
+                            radius: 30,
+                            barrierDismissible: false,
+                            actions: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  mainController.deleteSentence(currentSentence: widget.currentSentence);
+
+                                  Get.back();
+                                  Get.snackbar(
+                                    'UYARI',
+                                    'Cümle başarıyla silindi.',
+                                    borderColor: Colors.red,
+                                    borderWidth: 2,
+                                    snackPosition: SnackPosition.BOTTOM,
+                                    maxWidth: MediaQuery.of(context).size.width * 0.4,
+                                  );
+                                },
+                                child: const Text('EVET'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () => Get.back(),
+                                child: const Text('HAYIR'),
+                              ),
+                            ],
+                          );
+                        },
+                        icon: Icon(
+                          Icons.delete,
+                          color: Theme.of(context).primaryColor,
                         ),
-                        onTap: () => SentenceAddUpdateDialog(currentSentence: widget.currentSentence),
+                      ),
+                    ),
+
+                    /// update icon
+                    Positioned(
+                      right: 0.04.sw,
+                      top: 0.005.sh,
+                      child: IconButton(
+                        onPressed: () => SentenceAddUpdateDialog(currentSentence: widget.currentSentence),
+                        icon: Icon(
+                          Icons.refresh,
+                          color: Theme.of(context).primaryColor,
+                        ),
                       ),
                     ),
                   ],
@@ -180,7 +185,7 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     widget.currentSentence.content,
-                    style: const TextStyle(fontSize: 18, color: Colors.blue, fontStyle: FontStyle.italic),
+                    style: TextStyle(fontSize: 18, color: Theme.of(context).primaryColor, fontStyle: FontStyle.italic),
                   ),
                 ),
               ),
@@ -203,7 +208,10 @@ class _SentenceItemWidgetState extends State<SentenceItemWidget> with SingleTick
   Widget? _buildTrailingIcon(BuildContext context) {
     return RotationTransition(
       turns: _iconTurns,
-      child: const Icon(Icons.expand_more),
+      child: Icon(
+        Icons.expand_more,
+        color: _isExpanded ? Colors.deepOrangeAccent : Colors.blue,
+      ),
     );
   }
 

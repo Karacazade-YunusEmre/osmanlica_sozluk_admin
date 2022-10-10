@@ -1,52 +1,88 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:lugat_admin/models/concrete/sentence_model.dart';
 
+import '/models/concrete/sentence_model.dart';
+import '/utilities/string_extensions.dart';
 import '../main.dart';
 
 /// Created by Yunus Emre Yıldırım
 /// on 27.08.2022
 
 class MainController extends GetxController {
+  final fixedSentenceList = <SentenceModel>[];
+
   final sentenceList = <SentenceModel>[].obs;
-  List<SentenceModel> allSentenceList = [];
 
   @override
   Future<void> onInit() async {
     super.onInit();
 
-    for (QueryDocumentSnapshot<Map<String, dynamic>> item in sentenceCollection.docs) {
-      allSentenceList.add(SentenceModel.fromJson(item.data()));
-    }
-    sentenceList.value = allSentenceList;
+    await setupSentenceList();
   }
 
-  void updateSentence(SentenceModel model) {
-    int indexModel = sentenceList.indexOf(model);
+  ///#region setup methods
 
-    sentenceList[indexModel] = model;
+  Future<void> setupSentenceList() async {
+    List<SentenceModel>? tempSentenceList = await serviceStorage.getAll();
+
+    if (tempSentenceList != null && tempSentenceList.isNotEmpty) {
+      fixedSentenceList.addAll(tempSentenceList);
+      sentenceList.addAll(fixedSentenceList);
+    }
+  }
+
+  ///#endregion setup methods
+
+  ///#region event methods
+
+  Future<void> addSentence({required String title, required String content}) async {
+    SentenceModel sentenceModel = SentenceModel.withoutId(title: title, content: content);
+
+    String? serviceId = await serviceStorage.add(sentenceModel);
+    sentenceModel.id = serviceId;
+
+    sentenceList.add(sentenceModel);
+    fixedSentenceList.add(sentenceModel);
+  }
+
+  void updateSentence({required SentenceModel currentModel, required String title, required String content}) async {
+    int indexSentenceList = sentenceList.indexOf(currentModel);
+    int indexFixedSentenceList = fixedSentenceList.indexOf(currentModel);
+
+    currentModel.title = title;
+    currentModel.content = content;
+
+    serviceStorage.update(currentModel);
+    sentenceList[indexSentenceList] = currentModel;
+    fixedSentenceList[indexFixedSentenceList] = currentModel;
+  }
+
+  void deleteSentence({required SentenceModel currentSentence}) {
+    sentenceList.remove(currentSentence);
+    fixedSentenceList.remove(currentSentence);
+    serviceStorage.delete(currentSentence);
   }
 
   void searchSentence(String query) {
     List<SentenceModel> filteredList = [];
     if (query.isEmpty) {
-      filteredList = allSentenceList;
+      filteredList = fixedSentenceList;
     } else {
-      filteredList = [];
-      filteredList = allSentenceList.where((element) => removeUnAlphanumericCharacters(element.title).contains(removeUnAlphanumericCharacters(query))).toList();
+      filteredList.clear();
+      filteredList = fixedSentenceList.where((element) => element.title.removeUnAlphanumericCharacters.contains(query.removeUnAlphanumericCharacters)).toList();
     }
+    sentenceList.clear();
     sentenceList.value = filteredList;
   }
 
-  String removeUnAlphanumericCharacters(String str) {
-    List<String> tempCharacters = [];
-    RegExp regexCoTitle = RegExp(r'[a-zA-Z0-9öçşığüÖÇŞIĞÜ]+', multiLine: true);
-    Iterable<RegExpMatch> matches = regexCoTitle.allMatches(str.toLowerCase());
+  ///#endregion event methods
 
-    for (RegExpMatch item in matches) {
-      tempCharacters.add(item[0]!.toLowerCase());
-    }
+  ///#region general purpose methods
 
-    return tempCharacters.join();
+  void loadSentenceListAsDefault() {
+    sentenceList.clear();
+    sentenceList.addAll(fixedSentenceList);
   }
+
+  ///#endregion general purpose methods
+
 }

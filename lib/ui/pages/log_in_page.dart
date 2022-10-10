@@ -41,14 +41,11 @@ class LoginPage extends StatelessWidget {
   }
 
   Future<String?>? _authUser(LoginData loginData) {
-    debugPrint('Name: ${loginData.name}, Password: ${loginData.password}');
-
     return Future.delayed(loginTime).then((_) async {
       try {
-        final credential = await user.signInWithEmailAndPassword(email: loginData.name, password: loginData.password);
-        debugPrint('Giriş Yapan Kullanıcı bilgileri: ${credential.additionalUserInfo}');
-      } on FirebaseAuthException catch (e) {
-        debugPrint('email veya şifre hatalı. ${e.toString()}');
+        UserCredential credential = await serviceAuth.signInWithEmailAndPassword(loginData.name, loginData.password);
+        debugPrint('Giriş yapan kullanıcı bilgileri: ${credential.user?.email}');
+      } on FirebaseAuthException catch (_) {
         return 'Email veya Şifre hatalı';
       } catch (e) {
         debugPrint('Firebase oturum hatası: ${e.toString()}');

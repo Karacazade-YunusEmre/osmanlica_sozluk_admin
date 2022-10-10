@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import '../../../controllers/main_controller.dart';
@@ -19,7 +20,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
   /// toggle == 1 is search bar expand, toggle == 0 is search bar collapse
   int toggle = 0;
   late TextEditingController textController;
-  final double searchBarWidth = 400;
+  final double searchBarWidth = 0.5.sw;
   late Duration defaultAnimationDuration;
   late AnimationController animationController;
   late FocusNode focusNode;
@@ -40,7 +41,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
   void dispose() {
     animationController.dispose();
     focusNode.dispose();
-    mainController.dispose();
 
     super.dispose();
   }
@@ -53,17 +53,19 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
         return AnimatedContainer(
           duration: defaultAnimationDuration,
           width: toggle == 0 ? 32 : searchBarWidth,
+          height: toggle == 0 ? 0.1.sh : 0.07.sh,
           curve: Curves.easeInOut,
           decoration: BoxDecoration(
-            color: toggle == 0 ? Colors.transparent : Colors.white70,
+            color: toggle == 0 ? Colors.transparent : Theme.of(context).primaryColor,
             borderRadius: const BorderRadius.all(Radius.circular(30)),
           ),
           child: Stack(
             children: [
-              /// clear button animated positioned
+              ///#region clear button animated positioned
               AnimatedPositioned(
                 duration: defaultAnimationDuration,
                 right: 0,
+                top: 0.005.sh,
                 curve: Curves.easeInOut,
                 child: AnimatedOpacity(
                   duration: defaultAnimationDuration,
@@ -71,7 +73,10 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
                   child: Center(
                     child: Container(
                       padding: const EdgeInsets.all(8.0),
-                      decoration: const BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.all(Radius.circular(20))),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).secondaryHeaderColor,
+                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      ),
                       child: AnimatedBuilder(
                         animation: animationController,
                         builder: (BuildContext context, Widget? child) {
@@ -83,7 +88,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
                         child: InkWell(
                           onTap: () {
                             textController.clear();
-                            mainController.sentenceList.value = mainController.allSentenceList;
+                            mainController.loadSentenceListAsDefault();
                           },
                           child: const Icon(Icons.close, size: 24),
                         ),
@@ -93,11 +98,13 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
                 ),
               ),
 
-              /// search text animated positioned
+              ///#endregion clear button animated positioned
+
+              ///#region search text animated positioned
               AnimatedPositioned(
                 duration: defaultAnimationDuration,
-                left: toggle == 0 ? 0 : 20.0,
-                top: 14,
+                left: toggle == 0 ? 0 : 0.07.sw,
+                top: 0.025.sh,
                 curve: Curves.easeInOut,
                 child: AnimatedOpacity(
                   duration: defaultAnimationDuration,
@@ -108,69 +115,85 @@ class _SearchBarWidgetState extends State<SearchBarWidget> with SingleTickerProv
                     width: searchBarWidth / 1.5,
                     child: TextField(
                       controller: textController,
-                      autofocus: true,
+                      autofocus: false,
                       focusNode: focusNode,
                       cursorRadius: const Radius.circular(10.0),
                       cursorWidth: 2.0,
                       onEditingComplete: () => textController.clear(),
                       onChanged: mainController.searchSentence,
                       textInputAction: TextInputAction.search,
-                      style: const TextStyle(color: Colors.black54),
-                      cursorColor: Colors.black.withOpacity(0.5),
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.only(bottom: 5),
-                        isDense: true,
+                      style: const TextStyle(color: Colors.white),
+                      cursorColor: Colors.white.withOpacity(0.5),
+                      decoration: InputDecoration.collapsed(
                         floatingLabelBehavior: FloatingLabelBehavior.never,
-                        labelText: 'Kelime arayın ...',
-                        labelStyle: const TextStyle(
-                          color: Color(0xff5B5B5B),
-                          fontSize: 17.0,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        alignLabelWithHint: true,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20.0),
                           borderSide: BorderSide.none,
                         ),
+                        hintText: 'Başlığa göre arayın...',
                       ),
                     ),
                   ),
                 ),
               ),
 
-              /// search icon animated container
+              ///#endregion search text animated positioned
+
+              ///#region search icon animated container
               AnimatedBuilder(
                 animation: animationController,
                 builder: (BuildContext context, Widget? child) {
                   return AnimatedPositioned(
                     duration: defaultAnimationDuration,
-                    top: toggle == 0 ? 7 : 3,
+                    // top: toggle == 0 ? 0.01.sh : 0,
+                    left: toggle == 0 ? null : 0,
+                    right: toggle == 0 ? 0 : null,
                     curve: Curves.easeInOut,
-                    child: AnimatedContainer(
-                      duration: defaultAnimationDuration,
-                      curve: Curves.easeInOut,
-                      child: InkWell(
-                        child: AnimatedIcon(
-                          progress: animationController,
-                          icon: AnimatedIcons.search_ellipsis,
-                          semanticLabel: 'Listede kelime ara',
-                          color: toggle == 0 ? Colors.grey : Colors.black,
-                          size: 32,
-                        ),
-                        onTap: () {
-                          if (toggle == 0) {
-                            toggle = 1;
-                            animationController.forward();
-                          } else {
-                            toggle = 0;
-                            animationController.reverse();
-                          }
+                    child: IconButton(
+                      icon: AnimatedSwitcher(
+                        duration: defaultAnimationDuration,
+                        transitionBuilder: (Widget child, Animation<double> animation) {
+                          return RotationTransition(
+                            turns: child.key == const ValueKey('searchIcon') ? Tween<double>(begin: 1, end: 0.75).animate(animationController) : Tween<double>(begin: 0.75, end: 1).animate(animationController),
+                            child: FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            ),
+                          );
                         },
+                        child: toggle == 0
+                            ? Icon(
+                                Icons.search,
+                                size: 38,
+                                color: Theme.of(context).primaryColor,
+                                key: const ValueKey('searchIcon'),
+                              )
+                            : Icon(
+                                Icons.arrow_forward_ios,
+                                size: 32,
+                                color: Theme.of(context).secondaryHeaderColor,
+                                key: const ValueKey('backIcon'),
+                              ),
                       ),
+                      onPressed: () {
+                        if (toggle == 0) {
+                          toggle = 1;
+                          animationController.forward();
+                          FocusManager.instance.primaryFocus?.requestFocus();
+                        } else {
+                          toggle = 0;
+                          animationController.reverse();
+                          textController.clear();
+                          mainController.loadSentenceListAsDefault();
+                          FocusManager.instance.primaryFocus?.unfocus();
+                        }
+                      },
                     ),
                   );
                 },
               ),
+
+              ///#endregion search icon animated container
             ],
           ),
         );
