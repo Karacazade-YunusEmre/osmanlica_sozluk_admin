@@ -1,3 +1,4 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -59,17 +60,25 @@ class MainApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (BuildContext context, Widget? child) {
-        return GetMaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Lugat Admin',
-          theme: UIConstant.getDefaultThemeData,
-          getPages: GenerateRoute.getRoutes,
-          unknownRoute: GetPage(
-            name: '/page_not_found',
-            page: () => const PageNotFound(),
-            transition: Transition.leftToRightWithFade,
-            transitionDuration: const Duration(milliseconds: 375),
-          ),
+        return AdaptiveTheme(
+          light: UIConstant.defaultThemeLight,
+          dark: UIConstant.defaultThemeDark,
+          initial: AdaptiveThemeMode.light,
+          builder: (ThemeData lightTheme, ThemeData darkTheme) {
+            return GetMaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'Lugat Admin',
+              theme: lightTheme,
+              darkTheme: darkTheme,
+              getPages: GenerateRoute.getRoutes,
+              unknownRoute: GetPage(
+                name: '/page_not_found',
+                page: () => const PageNotFound(),
+                transition: Transition.leftToRightWithFade,
+                transitionDuration: const Duration(milliseconds: 375),
+              ),
+            );
+          },
         );
       },
     );

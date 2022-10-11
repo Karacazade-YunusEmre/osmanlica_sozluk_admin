@@ -16,7 +16,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FlutterLogin(
-      title: 'LUGAT',
+      title: 'OSMANLICA SÖZLÜK',
       messages: LoginMessages(
         userHint: 'Email ...',
         passwordHint: 'Şifre ...',
@@ -30,7 +30,7 @@ class LoginPage extends StatelessWidget {
           fontSize: 44,
         ),
       ),
-      logo: const AssetImage('images/lugat64.png'),
+      // logo: const AssetImage('images/lugat64.png'),
       onLogin: _authUser,
       userValidator: _userValidator,
       passwordValidator: _passwordValidator,

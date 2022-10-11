@@ -1,3 +1,5 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '/models/concrete/sentence_model.dart';
@@ -9,8 +11,9 @@ import '../main.dart';
 
 class MainController extends GetxController {
   final fixedSentenceList = <SentenceModel>[];
-
   final sentenceList = <SentenceModel>[].obs;
+
+  final _nightModeStatus = false.obs;
 
   @override
   Future<void> onInit() async {
@@ -18,6 +21,16 @@ class MainController extends GetxController {
 
     await setupSentenceList();
   }
+
+  ///#region getter and setter
+
+  /// nightModeStatus getter
+  bool get nightModeStatus => _nightModeStatus.value;
+
+  /// nightModeStatus setter
+  set nightModeStatus(bool newValue) => _nightModeStatus.value = newValue;
+
+  ///#endregion getter and setter
 
   ///#region setup methods
 
@@ -72,6 +85,11 @@ class MainController extends GetxController {
     }
     sentenceList.clear();
     sentenceList.value = filteredList;
+  }
+
+  void nightModeSwitchToggle(BuildContext context, bool newValue) {
+    nightModeStatus = newValue;
+    AdaptiveTheme.of(context).toggleThemeMode();
   }
 
   ///#endregion event methods
